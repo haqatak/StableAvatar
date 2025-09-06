@@ -66,7 +66,7 @@ transformer_path = f"{model_path}/StableAvatar-1.3B/transformer3d-square.pt"
 config = OmegaConf.load("deepspeed_config/wan2.1/wan_civitai.yaml")
 sampler_name = "Flow"
 # clip_sample_n_frames moved to UI parameter
-tokenizer = AutoTokenizer.from_pretrained(os.path.join(pretrained_model_name_or_path, config['text_encoder_kwargs'].get('tokenizer_subpath', 'tokenizer')), )
+tokenizer = AutoTokenizer.from_pretrained(config['text_encoder_kwargs'].get('tokenizer_subpath', 'tokenizer'))
 text_encoder = WanT5EncoderModel.from_pretrained(
     os.path.join(pretrained_model_name_or_path, config['text_encoder_kwargs'].get('text_encoder_subpath', 'text_encoder')),
     additional_kwargs=OmegaConf.to_container(config['text_encoder_kwargs']),
