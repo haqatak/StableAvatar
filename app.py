@@ -37,7 +37,10 @@ parser.add_argument("--mcp_server", action="store_true", help="是否启用mcp�
 args = parser.parse_args()
 
 
-if torch.cuda.is_available():
+if torch.backends.mps.is_available():
+    device = "mps"
+    dtype = torch.float16
+elif torch.cuda.is_available():
     device = "cuda" 
     if torch.cuda.get_device_capability()[0] >= 8:
         dtype = torch.bfloat16
