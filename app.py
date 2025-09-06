@@ -167,7 +167,7 @@ def generate(
     # Clear any existing device placements
     if GPU_memory_mode == "Normal":
         # For Normal mode, ensure all components are on GPU with correct dtype
-        pipeline.to(device=device)
+        pipeline.to(device=device, dtype=dtype)
         
         # pipeline.vae = pipeline.vae.to(device=device, dtype=dtype)
         # pipeline.text_encoder = pipeline.text_encoder.to(device=device, dtype=dtype)
