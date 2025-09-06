@@ -450,10 +450,23 @@ def main():
         device = torch.device(f"cuda:{get_world_group().local_rank}")
         print('rank=%d device=%s' % (get_world_group().rank, str(device)))
     else:
-        device = "cuda"
+        if torch.backends.mps.is_available():
+            device = "mps"
+        elif torch.cuda.is_available():
+            device = "cuda"
+        else:
+            device = "cpu"
 
     # device = set_multi_gpus_devices(args.ulysses_degree, args.ring_degree)
-    weight_dtype = torch.bfloat16
+    if "mps" in str(device):
+        weight_dtype = torch.float16
+    elif "cuda" in str(device):
+        if torch.cuda.is_available() and torch.cuda.get_device_capability(device)[0] >= 8:
+            weight_dtype = torch.bfloat16
+        else:
+            weight_dtype = torch.float16
+    else:  # cpu
+        weight_dtype = torch.float32
     sampler_name = "Flow"
     # GPU_memory_mode = "model_full_load"
     clip_sample_n_frames = args.clip_sample_n_frames
