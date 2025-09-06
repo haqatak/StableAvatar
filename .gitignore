@@ -1,0 +1,152 @@
+# Model weights and checkpoints
+checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.pkl
+*.onnx
+
+# Output files
+outputs/
+*.mp4
+*.avi
+*.mov
+*.gif
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environment
+bin/
+include/
+pyvenv.cfg
+lib/python*/
+share/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+
+# Machine learning specific
+wandb/
+runs/
+logs/
+tensorboard/
+mlruns/
+.neptune/
+.comet/
+
+# Large datasets
+data/
+datasets/
+*.h5
+*.hdf5
+*.npz
+*.csv
+
+# Audio files (unless specifically needed)
+*.wav
+*.mp3
+*.flac
+*.aac
+
+# Image files (large ones)
+*.png
+*.jpg
+*.jpeg
+*.tiff
+*.bmp
+
+# Accelerate config (may contain sensitive info)
+# Uncomment if you want to ignore accelerate configs
+# accelerate_config/
+
+# DeepSpeed config (may contain sensitive info)
+# Uncomment if you want to ignore deepspeed configs
+# deepspeed_config/
