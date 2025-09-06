@@ -42,6 +42,13 @@ try:
 except ModuleNotFoundError:
     FLASH_ATTN_2_AVAILABLE = False
 
+# Import our PyTorch flash attention implementation
+try:
+    from .pytorch_flash_attention import pytorch_flash_attention
+    PYTORCH_FLASH_ATTN_AVAILABLE = True
+except ImportError:
+    PYTORCH_FLASH_ATTN_AVAILABLE = False
+
 FLASH_ATTN_2_AVAILABLE = False
 FLASH_ATTN_3_AVAILABLE = False
 
@@ -76,7 +83,8 @@ def flash_attention(
     """
     half_dtypes = (torch.float16, torch.bfloat16)
     assert dtype in half_dtypes
-    assert q.device.type == 'cuda' and q.size(-1) <= 256
+    # Removed CUDA-only assertion to support other devices
+    # assert q.device.type == 'cuda' and q.size(-1) <= 256
 
     # params
     b, lq, lk, out_dtype = q.size(0), q.size(1), k.size(1), q.dtype
@@ -170,6 +178,7 @@ def attention(
         dtype=torch.bfloat16,
         fa_version=None,
 ):
+    # Try CUDA flash attention first (if available)
     if FLASH_ATTN_2_AVAILABLE or FLASH_ATTN_3_AVAILABLE:
         return flash_attention(
             q=q,
@@ -186,7 +195,25 @@ def attention(
             dtype=dtype,
             version=fa_version,
         )
+    # Use our PyTorch flash attention implementation
+    elif PYTORCH_FLASH_ATTN_AVAILABLE:
+        return pytorch_flash_attention(
+            q=q,
+            k=k,
+            v=v,
+            q_lens=q_lens,
+            k_lens=k_lens,
+            dropout_p=dropout_p,
+            softmax_scale=softmax_scale,
+            q_scale=q_scale,
+            causal=causal,
+            window_size=window_size,
+            deterministic=deterministic,
+            dtype=dtype,
+            version=fa_version,
+        )
     else:
+        # Fallback to PyTorch's scaled_dot_product_attention
         if q_lens is not None or k_lens is not None:
             warnings.warn(
                 'Padding mask is disabled when using scaled_dot_product_attention. It can have a significant impact on performance.'
@@ -197,11 +224,19 @@ def attention(
         k = k.transpose(1, 2)
         v = v.transpose(1, 2)
 
-        if torch.backends.cuda.flash_sdp_enabled() is False or torch.backends.cuda.enable_flash_sdp is False:
-            print(1/0)
-
-        out = torch.nn.functional.scaled_dot_product_attention(
-            q, k, v, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
+        # Use MPS backend if available (for Apple Silicon)
+        if torch.backends.mps.is_available() and q.device.type == 'mps':
+            out = torch.nn.functional.scaled_dot_product_attention(
+                q, k, v, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
+        elif torch.cuda.is_available() and q.device.type == 'cuda':
+            if torch.backends.cuda.flash_sdp_enabled() is False or torch.backends.cuda.enable_flash_sdp is False:
+                print(1/0)
+            out = torch.nn.functional.scaled_dot_product_attention(
+                q, k, v, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
+        else:
+            # CPU fallback
+            out = torch.nn.functional.scaled_dot_product_attention(
+                q, k, v, attn_mask=attn_mask, is_causal=causal, dropout_p=dropout_p)
 
         out = out.transpose(1, 2).contiguous()
     return out
