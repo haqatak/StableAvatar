@@ -727,7 +727,7 @@ class WanI2VTalkingInferenceLongPipeline(DiffusionPipeline):
                     # idx_list_audio = [ii % max_audio_index for ii in range(index_start * 4 * audio_token_per_frame, index_end * 4 * audio_token_per_frame)]
                     latents = latents_all[:, :, idx_list].clone()
                     sub_vocal_input_values = vocal_input_values[idx_list_audio]
-                    sub_vocal_input_values = self.wav2vec_processor(sub_vocal_input_values, sampling_rate=sr, return_tensors="pt").input_values.to(device)
+                    sub_vocal_input_values = self.wav2vec_processor(sub_vocal_input_values, sampling_rate=sr, return_tensors="pt").input_values.to(device=device, dtype=self.wav2vec.dtype)
                     sub_vocal_embeddings = self.wav2vec(sub_vocal_input_values).last_hidden_state
                     latent_model_input = torch.cat([latents] * 3) if do_classifier_free_guidance else latents
                     if hasattr(self.scheduler, "scale_model_input"):
