@@ -208,7 +208,7 @@ def sinusoidal_embedding_1d(dim, position):
     # preprocess
     assert dim % 2 == 0
     half = dim // 2
-    position = position.type(torch.float64)
+    position = position.type(torch.float32)
 
     # calculation
     sinusoid = torch.outer(
@@ -223,7 +223,7 @@ def rope_params(max_seq_len, dim, theta=10000):
     freqs = torch.outer(
         torch.arange(max_seq_len),
         1.0 / torch.pow(theta,
-                        torch.arange(0, dim, 2).to(torch.float64).div(dim)))
+                        torch.arange(0, dim, 2).to(torch.float32).div(dim)))
     freqs = torch.polar(torch.ones_like(freqs), freqs)
     return freqs
 
@@ -266,7 +266,7 @@ def get_1d_rotary_pos_embed_riflex(
         pos = torch.from_numpy(pos)  # type: ignore  # [S]
 
     freqs = 1.0 / torch.pow(theta,
-                            torch.arange(0, dim, 2).to(torch.float64).div(dim))
+                            torch.arange(0, dim, 2).to(torch.float32).div(dim))
 
     # === Riflex modification start ===
     # Reduce the intrinsic frequency to stay within a single period after extrapolation (see Eq. (8)).
